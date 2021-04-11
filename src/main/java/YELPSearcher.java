@@ -4,10 +4,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.search.*;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.QueryBuilder;
@@ -67,13 +64,35 @@ public class YELPSearcher {
     }
 
 
+    public ScoreDoc[] boostedSearch(String field, String keywords, int numHits, float boostAmount) {
+
+        //the query has to be analyzed the same way as the documents being index
+        //using the same Analyzer
+        QueryBuilder builder = new QueryBuilder(new StandardAnalyzer());
+        BoostQuery query = new BoostQuery(builder.createBooleanQuery(field, keywords), boostAmount);
+        ScoreDoc[] hits = null;
+        try {
+            //Create a TopScoreDocCollector
+            TopScoreDocCollector collector = TopScoreDocCollector.create(numHits);
+
+            //search index
+            lSearcher.search(query, collector);
+
+            //collect results
+            hits = collector.topDocs().scoreDocs;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hits;
+    }
+
     //search for keywords in specified field, with the number of top results
     public ScoreDoc[] searchPhraseQuery(String phrase, int numHits) {
 
     /*        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(
                 new string[] {"bodytext", "title"},
                 analyzer);*/
-        QueryParser queryParser = new QueryParser("business_id: lPkRneUrVwfJotHOVry36 AND user_id: 1cgS9qjOzjogPH3j9OV2Ig", new StandardAnalyzer());
+        QueryParser queryParser = new QueryParser(phrase, new StandardAnalyzer());
         ScoreDoc[] hits = null;
         try {
             //Create a TopScoreDocCollector
@@ -90,6 +109,26 @@ public class YELPSearcher {
         return hits;
     }
 
+
+    //search for keywords in specified field, with the number of top results
+    public ScoreDoc[] searchBoostedPhraseQuery(String phrase, int numHits, float boostAmount) {
+        QueryParser queryParser = new QueryParser(phrase, new StandardAnalyzer());
+        ScoreDoc[] hits = null;
+        try {
+            //Create a TopScoreDocCollector
+            TopScoreDocCollector collector = TopScoreDocCollector.create(numHits);
+
+            //search index
+            BoostQuery query = new BoostQuery(queryParser.parse(phrase), boostAmount);
+            lSearcher.search(query, collector);
+
+            //collect results
+            hits = collector.topDocs().scoreDocs;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hits;
+    }
 
 
     //present the search results

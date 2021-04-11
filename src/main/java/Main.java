@@ -63,7 +63,7 @@ public class Main {
         YELPSearcher searcherQ2a = new YELPSearcher(COS_INDEX_PATH);
 
         // Question 2
-        ScoreDoc[] hitsQ2 = searcherQ2a.searchPhraseQuery("business_id: lPkRneUrVwfJotHOVry36g AND review: nice", 20);
+        ScoreDoc[] hitsQ2 = searcherQ2a.searchPhraseQuery("review: food AND review: nice", 20);
         System.out.println("\n=================Results for Cosine review search=============\n");
         ArrayList<String> result2 = new ArrayList<String>();
         result2.add("user_id");
@@ -82,12 +82,6 @@ public class Main {
 
         // -- Create 20 queries, and retrieve top 10 results. You should use two retrieval models, and evaluation
         //their performance. You need to design the experiments.
-
-        // Testing code - to be removed
-        ScoreDoc[] hitsq2_1 = searcherQ2a.searchPhraseQuery("review:nice", 20);
-        System.out.println("\n=================Results for 1st review search=============\n");
-        searcherQ2a.printResult(hitsq2_1, result2);
-
 
         // Evaluation - WIP
         File qrelsFile = new File("yelp/qrels.txt");
@@ -110,6 +104,30 @@ public class Main {
         QualityStats avg = QualityStats.average(stats);
         avg.log("SUMMARY", 2, logger, "  ");
         dir.close();
+
+        // Question 3 - Query Level Boosting
+        //TODO: Document level boosting - while indexing - by calling document.setBoost() before a document is added to the index.
+        //TODO: Document's Field level boosting - while indexing - by calling field.setBoost() before adding a field to the document (and before adding the document to the index).
+
+        // Boosting for regular query
+        ScoreDoc[] hitsQ3 = searcherQ1.boostedSearch("friends", "wXyx23jwrL-O2kvw8hrA7g", 20, 5);
+        System.out.println("\n=================Results for boosted friends search=============\n");
+        ArrayList<String> result3 = new ArrayList<String>();
+        result3.add("name");
+        result3.add("friends");
+        searcherQ1.printResult(hitsQ3, result3);
+
+        // Boosting for phrase query
+        ScoreDoc[] hitsQ3a = searcherQ2a.searchBoostedPhraseQuery("review: food AND review: nice", 20, 20);
+        System.out.println("\n=================Results for boosted Cosine review search=============\n");
+        ArrayList<String> result3a = new ArrayList<String>();
+        result3a.add("user_id");
+        result3a.add("business_id");
+        result3a.add("review");
+        searcherQ2a.printResult(hitsQ3a, result3a);
+
+        //Question 4
+
     }
 }
 
