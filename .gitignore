@@ -1,1 +1,4 @@
 #exclude yelps json
+/*
+!/src
+!pom.xml
