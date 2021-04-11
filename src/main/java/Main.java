@@ -5,11 +5,8 @@ import org.apache.lucene.benchmark.quality.trec.TrecJudge;
 import org.apache.lucene.benchmark.quality.trec.TrecTopicsReader;
 import org.apache.lucene.benchmark.quality.utils.SimpleQQParser;
 import org.apache.lucene.benchmark.quality.utils.SubmissionReport;
-import org.apache.lucene.document.LatLonPoint;
-import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.benchmark.quality.*;
@@ -22,9 +19,6 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import static jdk.nashorn.internal.objects.Global.print;
 
 public class Main {
     public static final String DATA_FILE = "yelp/yelp_academic_dataset_user.json";
@@ -151,12 +145,21 @@ public class Main {
         // Q5 search a place in atlanta knowing atlanta is 33 and -84
         YELPSearcher searcherLocation = new YELPSearcher(LOCATION_INDEX_PATH);
 
-        ScoreDoc[] docs = searcherLocation.searchLocationQuery(33,-84, 300000,5);
+        ScoreDoc[] docs = searcherLocation.searchLocationQueryWithDistance(33,-84, 300000,5);
         ArrayList<String> result5 = new ArrayList<String>();
         result5.add("business_id");
-        result5.add("resteraunt_name");
+        result5.add("name");
+        result5.add("category");
+        result5.add("isOpen");
+      //  searcherLocation.printResult(docs, result5);
 
-        searcherLocation.printResult(docs, result5);
+        ScoreDoc[] docsNear = searcherLocation.searchNearestResteraunt(33,-84, 5);
+        searcherLocation.printResult(docsNear, result5);
+
+        ScoreDoc[] burgersInAtlanta = searcherLocation.searchResterauntsInACateory(33,-84,"Car Wash",300000,5);
+        System.out.println("====find all car wash near atlanta====");
+        searcherLocation.printResult(burgersInAtlanta, result5);
+
 
     }
 }

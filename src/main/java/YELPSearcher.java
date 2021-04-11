@@ -4,6 +4,7 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.FSDirectory;
@@ -115,7 +116,7 @@ public class YELPSearcher {
 
 
     //search for keywords in specified field, with the number of top results
-    public ScoreDoc[] searchBoostedPhraseQuery(String phrase, int numHits, float boostAmount) {
+    public ScoreDoc[] searchBoostedPhraseQuery(String phrase, int numHits, float boostAmount ) {
         QueryParser queryParser = new QueryParser(phrase, new StandardAnalyzer());
         ScoreDoc[] hits = null;
         try {
@@ -136,12 +137,11 @@ public class YELPSearcher {
 
 
     //search for keywords in specified field, with the number of top results
-    public ScoreDoc[] searchLocationQuery(double lat, double longt, int milimeter,int numHits) {
+    public ScoreDoc[] searchLocationQueryWithDistance(double lat, double longt, int milimeter, int numHits) {
 
 
         ScoreDoc[] hits = null;
         try {
-
         TopDocs docs = lSearcher.search(LatLonPoint.newDistanceQuery("geo_point", lat,longt, milimeter), numHits);
         hits =  docs.scoreDocs;
        // printResult(docs.scoreDocs, Arrays.asList("geo_point"));
@@ -153,6 +153,45 @@ public class YELPSearcher {
     }
 
 
+    //Search for nearest resteraunt given location
+    public ScoreDoc[] searchNearestResteraunt(double lat, double longt, int numHits) {
+
+
+        ScoreDoc[] hits = null;
+        try {
+            TopDocs docs =LatLonPoint.nearest(lSearcher,"geo_point", lat,longt, numHits);
+            hits =  docs.scoreDocs;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hits;
+    }
+
+    //search for resteraunt nearby in a category
+
+    public ScoreDoc[] searchResterauntsInACateory(double lat, double longt, String cat,int milimeter,int numHits) {
+        ScoreDoc[] hits = null;
+        try {
+            Query locationQuery =LatLonPoint.newDistanceQuery("geo_point", lat,longt, milimeter);
+            QueryBuilder queryBuilder = new QueryBuilder(new StandardAnalyzer());
+            Query category = queryBuilder.createBooleanQuery("category",cat);
+            Query isOpen = queryBuilder.createBooleanQuery("isOpen","1");
+
+            BooleanQuery.Builder combinedQuery = new BooleanQuery.Builder();
+            combinedQuery.add(category, BooleanClause.Occur.SHOULD);
+            combinedQuery.add(locationQuery, BooleanClause.Occur.SHOULD);
+            combinedQuery.add(isOpen, BooleanClause.Occur.SHOULD);
+            combinedQuery.setMinimumNumberShouldMatch(1);
+            BooleanQuery query = combinedQuery.build();
+            TopDocs docs = lSearcher.search(query, numHits);
+            hits =  docs.scoreDocs;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hits;
+    }
 
     //present the search results
     public void printResult(ScoreDoc[] hits, List<String> fieldName) throws Exception {

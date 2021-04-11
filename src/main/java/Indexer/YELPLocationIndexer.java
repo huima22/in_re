@@ -9,6 +9,7 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -54,9 +55,11 @@ public class YELPLocationIndexer {
                 String name = jObj.getString("name");
                 double latitude = Double.parseDouble(jObj.getString("latitude"));
                 double longitude = Double.parseDouble(jObj.getString("longitude"));
+                int isOpen = Integer.parseInt(jObj.getString("is_open"));
+                String category = jObj.getString("categories");
 
                 //create a document for each JSON record
-                Document doc=getDocument(latitude,longitude,businessId, name);
+                Document doc=getDocument(latitude,longitude,businessId, name,category, isOpen);
 
                 //index the document
                 writer.addDocument(doc);
@@ -77,7 +80,7 @@ public class YELPLocationIndexer {
 
     }
 
-    protected Document getDocument(double latitude, double longitude, String businessid, String name) {
+    protected Document getDocument(double latitude, double longitude, String businessid, String name, String category, int isOpen) {
         Document doc = new Document();
 
         FieldType ft = new FieldType(TextField.TYPE_STORED);
@@ -86,7 +89,9 @@ public class YELPLocationIndexer {
         ft.setStoreTermVectors(true);
 
         doc.add(new StoredField("business_id", businessid, ft));
-        doc.add(new StoredField("resteraunt_name",name));
+        doc.add(new StoredField("name",name));
+        doc.add(new TextField("category", category, Field.Store.YES));
+        doc.add(new StoredField("isOpen", isOpen));
         doc.add(new LatLonPoint("geo_point", latitude,longitude));
 
         return doc;
