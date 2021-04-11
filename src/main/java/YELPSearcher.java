@@ -29,6 +29,15 @@ public class YELPSearcher {
             e.printStackTrace();
         }
     }
+
+    public IndexSearcher getSearcher() {
+        return lSearcher;
+    }
+
+    public IndexReader getReader() {
+        return lReader;
+    }
+
     //report the number of documents indexed
     public int getCollectionSize() {
         return this.lReader.numDocs();
