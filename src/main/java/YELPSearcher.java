@@ -1,4 +1,5 @@
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Terms;
@@ -9,8 +10,11 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.QueryBuilder;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class YELPSearcher {
@@ -131,8 +135,27 @@ public class YELPSearcher {
     }
 
 
+    //search for keywords in specified field, with the number of top results
+    public ScoreDoc[] searchLocationQuery(double lat, double longt, int milimeter,int numHits) {
+
+
+        ScoreDoc[] hits = null;
+        try {
+
+        TopDocs docs = lSearcher.search(LatLonPoint.newDistanceQuery("geo_point", lat,longt, milimeter), numHits);
+        hits =  docs.scoreDocs;
+       // printResult(docs.scoreDocs, Arrays.asList("geo_point"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hits;
+    }
+
+
+
     //present the search results
-    public void printResult(ScoreDoc[] hits, ArrayList<String> fieldName) throws Exception {
+    public void printResult(ScoreDoc[] hits, List<String> fieldName) throws Exception {
         int i = 1;
         for (ScoreDoc hit : hits) {
             System.out.println("\nResult " + i + "\tDocID: " + hit.doc + "\t Score: " + hit.score);
