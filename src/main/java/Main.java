@@ -1,4 +1,5 @@
 import Indexer.YELPIndexer;
+import Indexer.YELPLocationIndexer;
 import Indexer.YELPReviewIndexer;
 import org.apache.lucene.benchmark.quality.trec.TrecJudge;
 import org.apache.lucene.benchmark.quality.trec.TrecTopicsReader;
@@ -19,19 +20,20 @@ import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import static jdk.nashorn.internal.objects.Global.print;
-
 public class Main {
     public static final String DATA_FILE = "yelp/yelp_academic_dataset_user.json";
     public static final String REVIEW_DATA_FILE = "yelp/yelp_academic_dataset_review.json";
+    public static final String LOCATION_DATA_FILE = "yelp/yelp_academic_dataset_business.json";
     public static final String INDEX_PATH = "yelp/luceneIndex";
     public static final String COS_INDEX_PATH = "yelp/luceneReviewCosIndex";
     public static final String BM25_INDEX_PATH = "yelp/luceneReviewBM25Index";
+    public static final String LOCATION_INDEX_PATH = "yelp/luceneLocationIndex";
 
 
     public static void main(String[] arg) throws Exception {
         boolean preformIndexForUser = false; //set to true if indexing for the first time. true;
         boolean preformIndexForReview = false; //set to true if indexing for the first time. true;
+        boolean preformIndexForLocation = false; //set to true if indexing for the first time. true;
         // To perform indexing. If there is no change to the data file, index only need to be created once
 
         if (preformIndexForUser) {
@@ -46,6 +48,16 @@ public class Main {
             YELPReviewIndexer indexer = new YELPReviewIndexer(BM25_INDEX_PATH, new BM25Similarity());
             indexer.indexYelps(REVIEW_DATA_FILE);
         }
+
+
+        if (preformIndexForLocation) {
+            YELPLocationIndexer locationIndexer = new YELPLocationIndexer(LOCATION_INDEX_PATH);
+            locationIndexer.indexYelpsResterauntLocation(LOCATION_DATA_FILE);
+
+        }
+
+
+
 
         //search index
         YELPSearcher searcherQ1 = new YELPSearcher(INDEX_PATH);
@@ -127,6 +139,27 @@ public class Main {
         searcherQ2a.printResult(hitsQ3a, result3a);
 
         //Question 4
+
+
+
+        // Q5 search a place in atlanta knowing atlanta is 33 and -84
+        YELPSearcher searcherLocation = new YELPSearcher(LOCATION_INDEX_PATH);
+
+        ScoreDoc[] docs = searcherLocation.searchLocationQueryWithDistance(33,-84, 300000,5);
+        ArrayList<String> result5 = new ArrayList<String>();
+        result5.add("business_id");
+        result5.add("name");
+        result5.add("category");
+        result5.add("isOpen");
+      //  searcherLocation.printResult(docs, result5);
+
+        ScoreDoc[] docsNear = searcherLocation.searchNearestResteraunt(33,-84, 5);
+        searcherLocation.printResult(docsNear, result5);
+
+        ScoreDoc[] burgersInAtlanta = searcherLocation.searchResterauntsInACateory(33,-84,"Car Wash",300000,5);
+        System.out.println("====find all car wash near atlanta====");
+        searcherLocation.printResult(burgersInAtlanta, result5);
+
 
     }
 }
