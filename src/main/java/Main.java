@@ -140,7 +140,7 @@ public class Main {
         String businessId = "R1KeQwYWkHczmZjSbfY2XA";
         ScoreDoc[] hitsQ4 = searcherQ2a.search("business_id", businessId,100);
         String review = searcherQ2a.generateReviewSummary(hitsQ4,10);
-        System.out.println(" Result Summary for business " + businessId +" \n" + review);
+        System.out.println(" for business " + businessId +" \n" + review);
 
 
 
