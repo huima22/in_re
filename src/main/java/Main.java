@@ -156,7 +156,12 @@ public class Main {
         result3a.add("review");
         searcherQ2a.printResult(hitsQ3a, result3a);
 
-        //Question 4
+        //Question 4 extractive summary for review
+        System.out.println("\n=================Results for summary review search: Get the summary of a business=============\n");
+        String businessId = "R1KeQwYWkHczmZjSbfY2XA";
+        ScoreDoc[] hitsQ4 = searcherQ2a.search("business_id", businessId,100);
+        String review = searcherQ2a.generateReviewSummary(hitsQ4,10);
+        System.out.println(" for business " + businessId +" \n" + review);
 
 
         // Q5 search a place in atlanta knowing atlanta is 33 and -84
@@ -168,15 +173,15 @@ public class Main {
         result5.add("name");
         result5.add("category");
         result5.add("isOpen");
-      //  searcherLocation.printResult(docs, result5);
+       searcherLocation.printResult(docs, result5);
 
-        ScoreDoc[] docsNear = searcherLocation.searchNearestResteraunt(33,-84, 5);
+        ScoreDoc[] docsNear = searcherLocation.searchNearestBusiness(33,-84, 5);
         searcherLocation.printResult(docsNear, result5);
 
-        ScoreDoc[] burgersInAtlanta = searcherLocation.searchResterauntsInACateory(33,-84,"Car Wash",300000,5);
-        System.out.println("====find all car wash near atlanta====");
+        ScoreDoc[] burgersInAtlanta = searcherLocation.searchNearestBusinessInACateory(33,-84,"Car Wash",300000,5);
+        System.out.println();
+        System.out.println("====find all open car wash near atlanta====");
         searcherLocation.printResult(burgersInAtlanta, result5);
-
 
     }
 }
