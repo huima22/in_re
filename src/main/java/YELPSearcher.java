@@ -138,8 +138,6 @@ public class YELPSearcher {
 
     //search for keywords in specified field, with the number of top results
     public ScoreDoc[] searchLocationQueryWithDistance(double lat, double longt, int milimeter, int numHits) {
-
-
         ScoreDoc[] hits = null;
         try {
         TopDocs docs = lSearcher.search(LatLonPoint.newDistanceQuery("geo_point", lat,longt, milimeter), numHits);
