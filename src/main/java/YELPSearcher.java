@@ -23,11 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.sax.BodyContentHandler;
-import org.apache.tika.parser.*;
-import org.xml.sax.SAXException;
 
 public class YELPSearcher {
     private IndexSearcher lSearcher;
