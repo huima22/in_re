@@ -176,7 +176,9 @@ public class Main {
         searcherQ1.printResult(hitsQ3, result3);
 
         // Boosting for phrase query - COS_INDEX_PATH
-        ScoreDoc[] hitsQ3a = searcherQ2a.searchBoostedPhraseQuery("review:food AND review:nice", 10, 20);
+        String it = "review:food AND review:nice";
+        System.out.printf("\nExecuting for Query: %s", it);
+        ScoreDoc[] hitsQ3a = searcherQ2a.searchBoostedPhraseQuery(it, 10, 10);
         System.out.println("\n=================Results for boosted TFIDF review search=============\n");
         ArrayList<String> result3a = new ArrayList<String>();
         result3a.add("user_id");
@@ -185,7 +187,8 @@ public class Main {
         searcherQ2a.printResult(hitsQ3a, result3a);
 
         // Boosting for phrase query - BM25_INDEX_PATH
-        ScoreDoc[] hitsQ3b = searcherQ2b.searchBoostedPhraseQuery("review:food AND review:nice", 10, 20);
+        System.out.printf("\nExecuting for Query: %s", it);
+        ScoreDoc[] hitsQ3b = searcherQ2b.searchBoostedPhraseQuery(it, 10, 10);
         System.out.println("\n=================Results for boosted TFIDF review search=============\n");
         ArrayList<String> result3b = new ArrayList<String>();
         result3b.add("user_id");
