@@ -27,7 +27,7 @@ public class Main {
     public static final String LOCATION_DATA_FILE = "yelp/yelp_academic_dataset_business.json";
 
     public static final String INDEX_PATH = "index/luceneIndex";
-    public static final String COS_INDEX_PATH = "index/luceneReviewCosIndex";
+    public static final String TFIDF_INDEX_PATH = "index/luceneReviewCosIndex";
     public static final String BM25_INDEX_PATH = "index/luceneReviewBM25Index";
     public static final String LOCATION_INDEX_PATH = "index/luceneLocationIndex";
 
@@ -43,7 +43,7 @@ public class Main {
         }
 
         if (performIndexForReview) {
-            YELPReviewIndexer classicIndexer = new YELPReviewIndexer(COS_INDEX_PATH, new ClassicSimilarity());
+            YELPReviewIndexer classicIndexer = new YELPReviewIndexer(TFIDF_INDEX_PATH, new ClassicSimilarity());
             classicIndexer.indexYelps(REVIEW_DATA_FILE);
 
             YELPReviewIndexer indexer = new YELPReviewIndexer(BM25_INDEX_PATH, new BM25Similarity());
@@ -71,7 +71,7 @@ public class Main {
 
         printQuestionNumber(2);
         // Question 2
-        YELPSearcher searcherQ2a = new YELPSearcher(COS_INDEX_PATH);
+        YELPSearcher searcherQ2a = new YELPSearcher(TFIDF_INDEX_PATH);
         YELPSearcher searcherQ2b = new YELPSearcher(BM25_INDEX_PATH);
 
         // -- Create 20 queries, and retrieve top 10 results. You should use two retrieval models, and evaluation
@@ -95,7 +95,6 @@ public class Main {
                 "review:Atlanta AND NOT review:bad", //non-bad reviews in atlanta
                 "review:Atlanta OR review:Atlantic AND review:coffee", //coffee in atlanta/atlantic
                 "review:Vietnamese OR review:bahn",  //vietnamese or bahn mi
-                "review:Vietnamese AND review:nice", //nice vietnamese reviews
                 "review:Burlington AND review:nice", //nice reviews in burlington
                 "review:Burlington AND review:Vietnamese", //vietnamese food in burlington
                 "review:Burlington AND review:Vietnamese AND review:good AND review:chicken" //vietnamese food in burlington that serves chicken with good reviews
@@ -104,7 +103,7 @@ public class Main {
         for (String it : queries) {
             System.out.printf("\nExecuting for Query: %s", it);
             ScoreDoc[] hitsQ2a = searcherQ2a.searchPhraseQuery(it, 10);
-            System.out.println("\n=================Results for Cosine review search=============\n");
+            System.out.println("\n=================Results for TFIDF review search=============\n");
             ArrayList<String> result2a = new ArrayList<String>();
             result2a.add("user_id");
             result2a.add("business_id");
@@ -130,11 +129,11 @@ public class Main {
         ;
 
         // Evaluation using Trec on documents
-        // Recall at 1/3 of the documents that are relevant matches
+        // Recall at 1/2 of the documents that are relevant matches
         File qrelsFile = new File("trec/qrels.txt");
         File topicsFile = new File("trec/topics.txt");
 
-        IndexReader ir = DirectoryReader.open(FSDirectory.open(Paths.get(COS_INDEX_PATH)));
+        IndexReader ir = DirectoryReader.open(FSDirectory.open(Paths.get(TFIDF_INDEX_PATH)));
         IndexSearcher searcher = new IndexSearcher(ir);
         String docNameField = "filename";
 
@@ -165,11 +164,11 @@ public class Main {
 
         printQuestionNumber(3);
         // Question 3 - Query Level Boosting
-        //TODO: Document level boosting - while indexing - by calling document.setBoost() before a document is added to the index.
-        //TODO: Document's Field level boosting - while indexing - by calling field.setBoost() before adding a field to the document (and before adding the document to the index).
+        //TODO: Improvement - Document level boosting - while indexing - by calling document.setBoost() before a document is added to the index.
+        //TODO: Improvement - Document's Field level boosting - while indexing - by calling field.setBoost() before adding a field to the document (and before adding the document to the index).
 
         // Boosting for regular query - sample
-        ScoreDoc[] hitsQ3 = searcherQ1.boostedSearch("friends", "wXyx23jwrL-O2kvw8hrA7g", 20, 5);
+        ScoreDoc[] hitsQ3 = searcherQ1.boostedSearch("friends", "wXyx23jwrL-O2kvw8hrA7g", 10, 5);
         System.out.println("\n=================Results for boosted friends search=============\n");
         ArrayList<String> result3 = new ArrayList<String>();
         result3.add("name");
@@ -177,8 +176,8 @@ public class Main {
         searcherQ1.printResult(hitsQ3, result3);
 
         // Boosting for phrase query - COS_INDEX_PATH
-        ScoreDoc[] hitsQ3a = searcherQ2a.searchBoostedPhraseQuery("review: food AND review: nice", 20, 20);
-        System.out.println("\n=================Results for boosted Cosine review search=============\n");
+        ScoreDoc[] hitsQ3a = searcherQ2a.searchBoostedPhraseQuery("review: food AND review: nice", 10, 20);
+        System.out.println("\n=================Results for boosted TFIDF review search=============\n");
         ArrayList<String> result3a = new ArrayList<String>();
         result3a.add("user_id");
         result3a.add("business_id");
@@ -186,8 +185,8 @@ public class Main {
         searcherQ2a.printResult(hitsQ3a, result3a);
 
         // Boosting for phrase query - BM25_INDEX_PATH
-        ScoreDoc[] hitsQ3b = searcherQ2b.searchBoostedPhraseQuery("review: food AND review: nice", 20, 20);
-        System.out.println("\n=================Results for boosted Cosine review search=============\n");
+        ScoreDoc[] hitsQ3b = searcherQ2b.searchBoostedPhraseQuery("review: food AND review: nice", 10, 20);
+        System.out.println("\n=================Results for boosted TFIDF review search=============\n");
         ArrayList<String> result3b = new ArrayList<String>();
         result3b.add("user_id");
         result3b.add("business_id");

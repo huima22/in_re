@@ -5,7 +5,7 @@
 #
 #
 
-0 	 0 	 yelp/yelp_academic_dataset_business.json     	 1
+0 	 0 	 yelp/yelp_academic_dataset_business.json     	 0
 0 	 0 	 yelp/yelp_academic_dataset_checkin.json     	 0
 0 	 0 	 yelp/yelp_academic_dataset_review.json     	 1
 0 	 0 	 yelp/yelp_academic_dataset_tip.json         	 0
