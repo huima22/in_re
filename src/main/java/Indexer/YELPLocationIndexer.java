@@ -87,7 +87,6 @@ public class YELPLocationIndexer {
         ft.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
         //ft.setIndexOptions(IndexOptions.DOCS_AND_FREQS);
         ft.setStoreTermVectors(true);
-
         doc.add(new StoredField("business_id", businessid, ft));
         doc.add(new StoredField("name",name));
         doc.add(new TextField("category", category, Field.Store.YES));
