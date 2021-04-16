@@ -18,6 +18,10 @@ Apache Lucene™ is a high-performance, full-featured text search engine library
 4. Reuslt summaries implemented; Extractive and Abstractive
 5. Geospatial/Location and keyword queries are supported
 
+## Sample Result
+
+Results can be found in `result.txt`.
+More information will be provided in a written report.
 
 ## Documentation and References
 
