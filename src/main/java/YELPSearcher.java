@@ -225,7 +225,7 @@ public class YELPSearcher {
 
     //search for resteraunt nearby in a category
 
-    public ScoreDoc[] searchNearestBusinessInACateory(double lat, double longt, String cat, int milimeter, int numHits) {
+    public ScoreDoc[] searchNearestBusinessInACategory(double lat, double longt, String cat, int milimeter, int numHits) {
         ScoreDoc[] hits = null;
         try {
             Query locationQuery =LatLonPoint.newDistanceQuery("geo_point", lat,longt, milimeter);

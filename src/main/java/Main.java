@@ -221,7 +221,7 @@ public class Main {
         ScoreDoc[] docsNear = searcherLocation.searchNearestBusiness(33, -84, 5);
         searcherLocation.printResult(docsNear, result5);
 
-        ScoreDoc[] burgersInAtlanta = searcherLocation.searchNearestBusinessInACateory(33, -84, "Car Wash", 300000, 5);
+        ScoreDoc[] burgersInAtlanta = searcherLocation.searchNearestBusinessInACategory(33, -84, "Car Wash", 300000, 5);
         System.out.println();
         System.out.println("====find all open car wash near atlanta====");
         searcherLocation.printResult(burgersInAtlanta, result5);
